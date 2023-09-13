@@ -88,21 +88,22 @@ const MovieDetails = () => {
                <p>Logout</p>
             </div>
         </div>
-
+        
         <div className='Movie_details_body'>
             <div className='Movie_details_image'>
-                {/* <img src={banner} alt=""/> */}
-                <img src={`${imgPath}${movie?.poster_path}`} alt='movieBanner' />
+                <img src={banner} alt="banner"/>
+                {/* <img src={`${imgPath}${movie?.poster_path}`} alt='movieBanner' /> */}
             </div>
-
-            
 
             <div className='movie_details'>
                 <div className='movie_details_left'>
                     <div className="movie_type" >  
                         <h2 data-test-id="movie-title" className='movie-title'style={{color:"#BE123C", fontSize:"3rem"}}>{movie?.title}</h2>
-                        <button>Action</button>
-                        <button>Drama</button>
+                        <div className='movie_type_button'>
+                            <button>Action</button>
+                            <button>Drama</button>
+                        </div>
+                        
                     </div>
                     <div className='movie_overview'>
                         <p data-test-id="movie-overview">
