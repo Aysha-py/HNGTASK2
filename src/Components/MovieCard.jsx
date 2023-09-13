@@ -29,7 +29,7 @@ const MovieCard = ({topMovies}) => {
   return (
     <>
 
-             <div className='movie_card'>
+            <div className='movie_card'>
                 <div className='movie_cards_title'>
                     <h4>Featured</h4>
                     <h5>See More <span><FaGreaterThan size={20}/></span></h5>
