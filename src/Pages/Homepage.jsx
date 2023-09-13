@@ -1,16 +1,81 @@
-import React from 'react'
+import React,{ useEffect, useState } from 'react'
 import tv from "../Assets/Images/tv.png"
 import { BsSearch } from 'react-icons/bs';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { ImFacebook2 } from 'react-icons/im';
-import { BsInstagram, BsYoutube } from 'react-icons/bs';
+import { BsInstagram, BsYoutube,BsFillPlayFill } from 'react-icons/bs';
 import { BiLogoTwitter } from 'react-icons/bi';
 import MovieCard from '../Components/MovieCard';
+import Imdb from "../Assets/Images/IMDB.png"
+import orange from "../Assets/Images/PngItem_1381056 1.jpg"
+import BarLoader from "react-spinners/BarLoader";
+import Axios from 'axios';
+import { css } from '@emotion/react';
+import toast, { Toaster } from 'react-hot-toast';
+import Button from 'react-bootstrap/Button';
+
+
 
 
 const Homepage = () => {
+    
+    const [topTenMovies, setTopTenMovies] = useState([])
+    const [isloading, setisloading] = useState(true);
+    const [isError, setIsError] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [searchError, setSearchError] = useState(false);
+    const TMDB_API_KEY = process.env.REACT_APP_API_KEY
+
+    
+
+   const fetchTrending = () => {
+    setisloading(true);
+     const searchURL = searchQuery
+    ? `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${searchQuery}`
+    : `https://api.themoviedb.org/3/movie/top_rated?api_key=${TMDB_API_KEY}`;
+
+        Axios.get(searchURL)
+            .then((response) => {
+            if (response.status === 200) {
+                 setisloading(false); 
+                const firstTenResults = response?.data?.results.slice(0, 10);
+                setTopTenMovies(firstTenResults)
+                  if (searchQuery) {
+                     setSearchResults(firstTenResults);
+                }
+            } else {
+                console.error('Failed to fetch data');
+            }
+            })
+            .catch((error) => {
+                setisloading(false); 
+                setIsError(true);
+                toast.error("Oops, data cannot be fetched! Check your internet connection");
+            });
+};
+
+
+const override = css`
+  display: block;
+  margin: 0 auto;
+  border-color: red;
+ 
+`;
+
+
+    useEffect(()=>{
+    fetchTrending()
+    },[])
+    console.log(topTenMovies)
+
+
+
   return (
     <div className='homepage_container'>
+
+
 
         <header>
             <div className='header-items'>
@@ -22,8 +87,12 @@ const Homepage = () => {
 
                     <div className='search-items'>
                         <div className='search-items-box'>
-                             <input name="search" id='search' placeholder='What did you want to watch'/>
-                        <span><BsSearch size={24}/></span>
+                             <input  name="search"
+                                id='search'
+                                placeholder='What did you want to watch'
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}/>
+                            <span><BsSearch size={24} onClick={fetchTrending}/></span>
                         </div>
                        
                     </div>
@@ -36,11 +105,11 @@ const Homepage = () => {
 
                 <div className='movie_info'>
                     <h1>John Wick 3 : Parabellum</h1>
-                    <div className='rating'>
-                        <img src='' alt="ratingType" />
-                        <span>86.0/ 100</span>
-                        <span><BiLogoTwitter/> 97%</span>
-                    </div>
+                    {/* <div className='rating'>
+                        <span><img src={Imdb} alt="ratingType" />86.0/100</span>
+                       
+                        <span><img src={orange} alt="ratingType" />97%</span>
+                    </div> */}
                     <div className='movie_details'>
                         <p>
                             John Wick is on the run after killing a member of the 
@@ -48,16 +117,28 @@ const Homepage = () => {
                             on his head, he is the target of hit men and women everywhere.
                         </p>
                     </div>
-                    <button>Watch Trailer</button>
+                    <div className='watch_trailer'>
+                        <Button variant="danger" size='lg'><BsFillPlayFill size={30}/>WATCH TRAILER</Button>
+                    </div>
+                    
                 </div>
                
                
             </div>
         </header>
        
-        <main>
-            <MovieCard/>
-        </main>
+        <div className="movie_card_container">
+        {
+            isloading ?  <BarLoader color={'red'} css={override} isloading={true}  style={{ width: '50%' }}/> :
+            isError ?  <Toaster position="top-center"/>
+                :
+            
+            
+                (
+                <MovieCard topMovies={searchQuery ? searchResults : topTenMovies}/>
+                )
+}
+        </div>
 
         <footer>
             <div className='social_media'>
